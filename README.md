@@ -1,2 +1,2 @@
 # generalfiles
-for public repo
+Testing for public repo for transferring files for lab. Generic info ONLY!
