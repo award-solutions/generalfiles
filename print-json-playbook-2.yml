@@ -1,0 +1,84 @@
+
+- name: print json formatted output
+  hosts: all
+  tags: optional_play
+  vars:
+    user_info:  {"name": "student1", "group": "wheel", "state": "present",
+                   "note": [
+                            {
+                              "priv":"admin",
+                              "location": "USA"
+                            }
+                           ]
+                  }
+
+    targetKeys: "{{hostvars[inventory_hostname].keys()}}"
+
+    ipv4Address: "{{hostvars[inventory_hostname]['ansible_all_ipv4_addresses']}}"
+    # ipv4Address: "{{hostvars[inventory_hostname].ansible_all_ipv4_addresses}}"
+
+    targetIPBySubIndexing: "{{hostvars[inventory_hostname]['ansible_eth0']['ipv4']}}"
+
+
+
+  tasks:
+
+    # display user info
+    - name: display user info in different ways - capture the user_info into a register
+      debug:  msg="{{user_info}}"
+      register: user_info_output
+
+    - name: print the user_info from the register
+      debug:
+        msg: "The user_info saved in a register {{user_info_output}}"
+
+    - name: print the user_info from the register
+      debug: var=user_info_output
+
+    - name: print a field in json structure
+      debug:
+        msg:
+          - "The name of the user is  {{user_info.name}}"
+          - "The group of the user is  {{user_info.group}}"
+
+          #note that note is a structure that uses []. Thereofore, [0] is used
+          - "The user is located in the {{user_info.note[0].location}}"
+          - "The name of the user from the register is  {{user_info_output.msg.name}}"
+          - "The state of the user from the register is {{user_info_output.msg.state}}"
+
+
+
+# display ipvaddress
+    - name: print the target ipv4 address from hostvars
+      debug:
+        msg: "{{ipv4Address}}"
+
+
+# display ansible_etho.ipv4
+    - name: lookup target IP by subindexing into the key ansible_eth0 from hostvars key
+      debug:
+        msg: "{{targetIPBySubIndexing}}"
+
+
+    - name: lookup target IP by subindexing into the key ansible_eth0 from hostvars key
+      debug:
+        msg: "{{hostvars[inventory_hostname]['ansible_eth0']['ipv4']}}"
+
+
+    - name: print a field in json structure ansible_etho.ipv4
+      debug:
+        msg: "ansible.all.ipv4.addresses is {{hostvars[inventory_hostname]['ansible_eth0']['ipv4'].broadcast}}"
+
+
+    - name: print fields in ansible_etho.ipv4 json structure
+      debug:
+        msg:
+          - "ansible_etho.ipv4.broadcast is {{hostvars[inventory_hostname]['ansible_eth0']['ipv4'].address}}"
+          - "ansible_etho.ipv4.broadcast is {{hostvars[inventory_hostname]['ansible_eth0']['ipv4'].broadcast}}"
+          - "ansible_etho.ipv4.netmask is {{hostvars[inventory_hostname]['ansible_eth0']['ipv4'].netmask}}"
+          - "ansible_etho.ipv4.netmask is {{hostvars[inventory_hostname]['ansible_eth0']['ipv4'].network}}"
+
+    - name: get individual value address from ansible_etho.ipv4 json structure
+      debug: var=hostvars[inventory_hostname]['ansible_eth0']['ipv4'].address
+
+
