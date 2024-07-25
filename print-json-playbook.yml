@@ -1,0 +1,34 @@
+
+- name: print json formatted output
+  hosts: all
+  tags: optional_play
+  vars:
+    - user_info:  {"name": "student1", "group": "wheel", "state": "present",
+                   "note": [
+                            {
+                              "priv":"admin",
+                              "location": "USA"
+                            }
+                           ]
+                  }
+
+  tasks:
+    - name: capture the user_info into a register
+      debug:  msg="{{user_info}}"
+      register: user_info_output
+
+    - name: print the user_info from the register
+      debug:
+        msg: "The user_info saved in a register {{user_info_output}}"
+
+    - name: print a field in json structure
+      debug:
+        msg:
+          - "The name of the user is  {{user_info.name}}"
+          - "The group of the user is  {{user_info.group}}"
+
+          #note that note is a structure that uses []. Thereofore, [0] is used
+          - "The user is located in the {{user_info.note[0].location}}"
+          - "The name of the user from the register is  {{user_info_output.msg.name}}"
+          - "The state of the user from the register is {{user_info_output.msg.state}}"
+
